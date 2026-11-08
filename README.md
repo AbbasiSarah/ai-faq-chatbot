@@ -2,7 +2,7 @@
 
 **A customer-support chatbot that answers from a business's own FAQ, and knows when to hand over to a human.**
 
-### ▶ [Try the live demo](https://abbasisarah.github.io/demos/faq-chatbot/)
+### ▶ [Try the live demo](https://abbasisarah.github.io/demos/faq-chatbot/) · [Watch the video](https://abbasisarah.github.io/assets/videos/demo-ai-faq-chatbot.mp4)
 
 ![demo](assets/demo-desktop.png)
 
