@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI FAQ Chatbot demo · SheCodesAI</title>
+<meta name="description" content="A live demo of an FAQ chatbot that answers customer questions from a business's own FAQ, built by Sara Abbasi (SheCodesAI).">
+<style>
+  :root { --bg:#040b20; --bg2:#0b1e4a; --card:#09183c; --line:#1c3263; --ink:#eef3ff; --muted:#9fb0d4; --teal:#2fe0bf; --gold:#f5b70a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink);
+         background:radial-gradient(1200px 700px at 85% -10%, var(--bg2), var(--bg) 60%) fixed; min-height:100vh; }
+  .wrap { max-width:760px; margin:0 auto; padding:28px 18px 40px; }
+  .brand { font-weight:700; color:var(--teal); text-decoration:none; }
+  .brand span { color:var(--muted); font-weight:400; }
+  h1 { font-size:clamp(26px,5vw,38px); margin:18px 0 6px; line-height:1.15; }
+  h1 em { color:var(--gold); font-style:normal; }
+  .sub { color:var(--muted); margin:0 0 18px; line-height:1.5; }
+  .chat { background:var(--card); border:1px solid var(--line); border-radius:22px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.35); }
+  .head { display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.02); }
+  .dot { width:38px; height:38px; border-radius:50%; background:var(--teal); color:var(--bg); display:grid; place-items:center; font-weight:800; }
+  .head b { display:block; } .head small { color:var(--muted); }
+  .log { height:min(52vh,460px); overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:12px; }
+  .msg { max-width:82%; padding:11px 15px; border-radius:16px; line-height:1.45; white-space:pre-wrap; }
+  .bot { background:#10275a; border-top-left-radius:4px; align-self:flex-start; }
+  .me { background:var(--teal); color:var(--bg); border-top-right-radius:4px; align-self:flex-end; font-weight:500; }
+  .meta { display:block; margin-top:6px; font-size:12px; color:var(--muted); }
+  .meta.hand { color:var(--gold); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; padding:0 18px 14px; }
+  .chip { border:1px solid var(--line); background:transparent; color:var(--ink); padding:7px 12px; border-radius:999px; cursor:pointer; font-size:14px; }
+  .chip:hover { border-color:var(--teal); color:var(--teal); }
+  form { display:flex; gap:10px; padding:14px; border-top:1px solid var(--line); }
+  input { flex:1; background:#06122e; border:1px solid var(--line); color:var(--ink); border-radius:14px; padding:12px 14px; font-size:16px; outline:none; }
+  input:focus { border-color:var(--teal); }
+  button.send { background:var(--gold); color:var(--bg); border:0; border-radius:14px; padding:0 18px; font-weight:700; cursor:pointer; font-size:15px; }
+  .how { margin-top:22px; color:var(--muted); line-height:1.6; font-size:15px; }
+  .how b { color:var(--ink); }
+  .cta { margin-top:20px; padding:16px 18px; border:1px solid var(--line); border-radius:18px; background:rgba(47,224,191,.06); }
+  .cta a { color:var(--teal); }
+  footer { margin-top:26px; color:var(--muted); font-size:13px; }
+  footer em { color:var(--gold); font-style:normal; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="brand" href="https://abbasisarah.github.io">SheCodesAI <span>· Sara Abbasi</span></a>
+  <h1>An FAQ chatbot that <em>knows when to ask a human</em></h1>
+  <p class="sub">Try it! This assistant answers questions for <b>Sunrise Tech Academy</b>, a fictional demo business. Ask in English or Roman Urdu, with typos if you like. When it isn't sure, it hands over to a person instead of guessing.</p>
+
+  <div class="chat">
+    <div class="head"><div class="dot">S</div><div><b>Sunrise Tech Academy assistant</b><small>Demo · answers from the academy's FAQ</small></div></div>
+    <div class="log" id="log" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <form id="form"><input id="q" placeholder="Type a question… e.g. fees kitni hai?" autocomplete="off" aria-label="Your question"><button class="send">Send</button></form>
+  </div>
+
+  <div class="how">
+    <p><b>How it works.</b> Every FAQ question, plus other ways people ask it, is turned into numbers with <b>TF-IDF</b>, using whole words and 3–4 letter chunks, so "fees", "fee" and "feez" still match. Your question gets the same treatment, and <b>cosine similarity</b> finds the closest FAQ. If the confidence is below 35%, the bot hands the question to a person.</p>
+    <p>It runs entirely in your browser, with no data sent anywhere. To use it for a real business, swap in their FAQ. It can also be connected to WhatsApp, a website widget, or an AI model for longer answers.</p>
+  </div>
+  <div class="cta"><b>Want a chatbot like this for your business?</b><br>Code: <a href="https://github.com/AbbasiSarah/ai-faq-chatbot">github.com/AbbasiSarah/ai-faq-chatbot</a> · More: <a href="https://abbasisarah.github.io/hire/">Hire me</a></div>
+  <footer>Built by Sara Abbasi · SheCodesAI · <em>Don't just dream, Code !t</em></footer>
+</div>
+<script>// FAQ matcher for the browser: the same method as faq_bot.py
+// (TF-IDF on words + 3-4 letter chunks, cosine similarity, confidence threshold).
+(function (root) {
+  const STOP = new Set(("a about above after again against all am an and any are as at be because been before being below between both but by " +
+    "can could did do does doing down during each few for from further had has have having he her here hers herself him himself his i if in into is it its " +
+    "itself just me more most my myself nor of off on once only or other our ours ourselves out over own same she should so some such than that the their " +
+    "theirs them themselves then there these they this those through to too under until up very was we were what which while whom why will with would you " +
+    "your yours yourself yourselves also get got may might must shall us hai hy hain kya kia ka ki ke ko se mein main kab kaun kon kaise kitni kitne kitna " +
+    "tell want know please pls").split(" "));
+  const KEEP = new Set(["no", "not", "online", "where", "when", "how", "who"]);
+
+  function clean(t) {
+    const w = (t.toLowerCase().match(/[a-z0-9]+/g) || []).filter(x => !STOP.has(x) || KEEP.has(x));
+    return w.length ? w.join(" ") : t.toLowerCase();
+  }
+  function wordGrams(t) {
+    const w = t.match(/[a-z0-9]{2,}/g) || [], out = [...w];
+    for (let i = 0; i + 1 < w.length; i++) out.push(w[i] + " " + w[i + 1]);
+    return out;
+  }
+  function charGrams(t) {
+    const out = [];
+    for (const w of t.split(/\s+/).filter(Boolean)) {
+      const p = " " + w + " ";
+      for (const n of [3, 4]) for (let i = 0; i + n <= p.length; i++) out.push(p.slice(i, i + n));
+    }
+    return out;
+  }
+  function Tfidf(docs, grams) {
+    const df = new Map(), n = docs.length, toks = docs.map(grams);
+    toks.forEach(ts => new Set(ts).forEach(g => df.set(g, (df.get(g) || 0) + 1)));
+    const idf = g => Math.log((1 + n) / (1 + (df.get(g) || 0))) + 1;
+    const vec = ts => {
+      const tf = new Map(); ts.forEach(g => { if (df.has(g)) tf.set(g, (tf.get(g) || 0) + 1); });
+      const v = new Map(); let norm = 0;
+      tf.forEach((c, g) => { const x = (1 + Math.log(c)) * idf(g); v.set(g, x); norm += x * x; });
+      norm = Math.sqrt(norm) || 1; v.forEach((x, g) => v.set(g, x / norm)); return v;
+    };
+    const mat = toks.map(vec);
+    return { mat, query: t => vec(grams(t)) };
+  }
+  const dot = (a, b) => { let s = 0; a.forEach((x, g) => { const y = b.get(g); if (y) s += x * y; }); return s; };
+
+  function FAQBot(data, threshold = 0.35) {
+    const texts = [], ans = [], qs = [];
+    for (const it of data.faqs.concat(data.smalltalk || [])) for (const t of [it.q].concat(it.alt || [])) { texts.push(clean(t)); ans.push(it.a); qs.push(it.q); }
+    const W = Tfidf(texts, wordGrams), C = Tfidf(texts, charGrams);
+    this.ask = function (question) {
+      if (!question.trim()) return { answer: data.greeting, matched: null, confidence: 1 };
+      const q = clean(question), wq = W.query(q), cq = C.query(q);
+      let best = -1, bs = -1;
+      for (let i = 0; i < texts.length; i++) { const s = 0.5 * dot(wq, W.mat[i]) + 0.5 * dot(cq, C.mat[i]); if (s > bs) { bs = s; best = i; } }
+      return bs < threshold ? { answer: data.fallback, matched: null, confidence: bs } : { answer: ans[best], matched: qs[best], confidence: bs };
+    };
+  }
+  root.FAQBot = FAQBot;
+  if (typeof module !== "undefined") module.exports = { FAQBot };
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+const DATA = {
+  "business": "Sunrise Tech Academy",
+  "note": "A fictional demo business. Replace these questions and answers with your own.",
+  "fallback": "I'm not sure about that one. I've passed your question to our team, and they'll reply on WhatsApp within a few hours. You can also call 0300-0000000 (demo number).",
+  "greeting": "Hi! I'm the Sunrise Tech Academy assistant. Ask me about courses, fees, timings or admissions.",
+  "faqs": [
+    {
+      "q": "What courses do you offer?",
+      "alt": [
+        "which courses are available",
+        "list of courses",
+        "what can I learn here",
+        "courses kya hain",
+        "kon se course hain"
+      ],
+      "a": "We offer 4 courses: Python for Beginners, Data Science with Python, Machine Learning, and Web Development (HTML, CSS, JavaScript)."
+    },
+    {
+      "q": "Do you teach other languages like Java or C++?",
+      "alt": [
+        "do you teach java",
+        "c++ course",
+        "javascript course",
+        "other programming languages",
+        "android app development",
+        "java sikhate ho"
+      ],
+      "a": "Right now we teach Python, Data Science, Machine Learning and Web Development (which includes JavaScript). Java and C++ aren't offered yet, but tell us if you're interested and we'll let you know when they start."
+    },
+    {
+      "q": "How much are the fees?",
+      "alt": [
+        "what is the fee",
+        "course price",
+        "how much does it cost",
+        "fees kitni hai",
+        "fee structure",
+        "cost of the course"
+      ],
+      "a": "Python for Beginners is Rs 15,000. Data Science and Web Development are Rs 25,000 each. Machine Learning is Rs 35,000. You can pay in 2 instalments."
+    },
+    {
+      "q": "Can I pay in instalments?",
+      "alt": [
+        "installment plan",
+        "pay monthly",
+        "can I pay later",
+        "qist",
+        "split the payment"
+      ],
+      "a": "Yes. You can pay 50% at admission and 50% after the first month."
+    },
+    {
+      "q": "Is there a discount?",
+      "alt": [
+        "any discount",
+        "student discount",
+        "sibling discount",
+        "offer",
+        "promo"
+      ],
+      "a": "Students get 10% off with a valid student card, and there's 15% off if two siblings or friends join together."
+    },
+    {
+      "q": "What are the class timings?",
+      "alt": [
+        "class time",
+        "when are classes",
+        "schedule",
+        "timing kya hai",
+        "what time do classes start",
+        "weekend classes"
+      ],
+      "a": "Weekday classes run 6 pm to 8 pm, Monday to Thursday. Weekend classes run 10 am to 2 pm on Saturdays."
+    },
+    {
+      "q": "How long is each course?",
+      "alt": [
+        "course duration",
+        "how many weeks",
+        "how many months",
+        "kitne mahine ka course",
+        "length of course"
+      ],
+      "a": "Python for Beginners is 6 weeks. Data Science and Web Development are 10 weeks. Machine Learning is 12 weeks."
+    },
+    {
+      "q": "Are classes online or on campus?",
+      "alt": [
+        "online classes",
+        "physical classes",
+        "can I study from home",
+        "remote",
+        "online hai ya physical"
+      ],
+      "a": "Both. You can join on campus or online live on Zoom. Recordings are shared after every class."
+    },
+    {
+      "q": "Where are you located?",
+      "alt": [
+        "address",
+        "location",
+        "where is the campus",
+        "how to reach you",
+        "office kahan hai"
+      ],
+      "a": "Our campus is at Blue Area, Islamabad (demo address). It's a 5-minute walk from the main metro bus stop."
+    },
+    {
+      "q": "How do I apply?",
+      "alt": [
+        "admission process",
+        "how to enroll",
+        "how can I register",
+        "sign up",
+        "admission kaise len",
+        "join the course"
+      ],
+      "a": "Fill in the online form on our website, pay the first instalment, and you'll get a confirmation email with your class link and timetable."
+    },
+    {
+      "q": "When does the next batch start?",
+      "alt": [
+        "next batch",
+        "start date",
+        "new session",
+        "when can I join",
+        "agla batch kab hai"
+      ],
+      "a": "New batches start on the 1st of every month. Admissions close 3 days before."
+    },
+    {
+      "q": "Do I need any experience?",
+      "alt": [
+        "is it for beginners",
+        "prerequisites",
+        "I am a beginner",
+        "no coding background",
+        "requirements"
+      ],
+      "a": "No experience is needed for Python for Beginners or Web Development. For Data Science and Machine Learning, you should know basic Python first."
+    },
+    {
+      "q": "Do I need my own laptop?",
+      "alt": [
+        "laptop required",
+        "computer needed",
+        "system requirements",
+        "can I use a phone"
+      ],
+      "a": "Yes, please bring a laptop with at least 8 GB RAM. All the software we use is free, and we'll help you install it in the first class."
+    },
+    {
+      "q": "Will I get a certificate?",
+      "alt": [
+        "certificate",
+        "is there a certificate",
+        "certification",
+        "certificate milega"
+      ],
+      "a": "Yes. You get a certificate when you complete the course and submit the final project."
+    },
+    {
+      "q": "Do you help with jobs or internships?",
+      "alt": [
+        "job placement",
+        "internship",
+        "career support",
+        "will I get a job",
+        "job milegi"
+      ],
+      "a": "We help with your CV, GitHub portfolio and interview practice, and we share internship openings from partner companies. We can't guarantee a job."
+    },
+    {
+      "q": "Can I get a refund?",
+      "alt": [
+        "refund policy",
+        "money back",
+        "cancel admission",
+        "paise wapis"
+      ],
+      "a": "You can get a full refund within 7 days of the batch starting. After that, the fee isn't refundable, but you can move to a later batch once."
+    },
+    {
+      "q": "Who are the teachers?",
+      "alt": [
+        "instructors",
+        "trainers",
+        "who teaches",
+        "teacher kaun hai",
+        "faculty"
+      ],
+      "a": "Our trainers are working data scientists and developers with industry and teaching experience."
+    },
+    {
+      "q": "What if I miss a class?",
+      "alt": [
+        "missed class",
+        "class recording",
+        "I was absent",
+        "makeup class"
+      ],
+      "a": "Every class is recorded. You can watch the recording and ask questions in the next class or in our student WhatsApp group."
+    },
+    {
+      "q": "Are there projects in the course?",
+      "alt": [
+        "practical work",
+        "real projects",
+        "hands on",
+        "assignments"
+      ],
+      "a": "Yes, every course is practical. You build a project every week and one final project for your portfolio."
+    },
+    {
+      "q": "Do you teach girls-only batches?",
+      "alt": [
+        "female batch",
+        "ladies batch",
+        "women only class",
+        "girls batch"
+      ],
+      "a": "Yes, we run a women-only weekend batch for every course."
+    },
+    {
+      "q": "How can I contact you?",
+      "alt": [
+        "phone number",
+        "whatsapp",
+        "email",
+        "talk to someone",
+        "contact number"
+      ],
+      "a": "WhatsApp us at 0300-0000000 or email hello@sunrise-demo.example (demo contact details)."
+    }
+  ],
+  "smalltalk": [
+    {
+      "q": "hi",
+      "alt": [
+        "hello",
+        "hey",
+        "salam",
+        "assalam o alaikum",
+        "good morning"
+      ],
+      "a": "Hi! How can I help you today? You can ask about courses, fees, timings or admissions."
+    },
+    {
+      "q": "thank you",
+      "alt": [
+        "thanks",
+        "shukriya",
+        "great thanks",
+        "ok thanks"
+      ],
+      "a": "You're welcome! Anything else I can help with?"
+    }
+  ]
+};
+const bot = new FAQBot(DATA);
+const log = document.getElementById('log'), q = document.getElementById('q');
+function add(text, who, meta, hand) {
+  const d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text;
+  if (meta) { const m = document.createElement('span'); m.className = 'meta' + (hand ? ' hand' : ''); m.textContent = meta; d.appendChild(m); }
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+function ask(text) {
+  if (!text.trim()) return;
+  add(text, 'me');
+  const r = bot.ask(text);
+  setTimeout(() => add(r.answer, 'bot', r.matched ? `matched: "${r.matched}" · ${Math.round(r.confidence * 100)}% sure` : `handed to a human · only ${Math.round(r.confidence * 100)}% sure`, !r.matched), 350);
+}
+add(DATA.greeting, 'bot');
+['fees kitni hai?', 'Can I pay in instalments?', 'Is there a girls batch?', 'I am a beginner', 'Do you teach Java?', "What's the capital of France?"].forEach(s => {
+  const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = s; b.onclick = () => ask(s);
+  document.getElementById('chips').appendChild(b);
+});
+document.getElementById('form').addEventListener('submit', e => { e.preventDefault(); ask(q.value); q.value = ''; q.focus(); });
+</script>
+</body>
+</html>

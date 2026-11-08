@@ -1,0 +1,260 @@
+{
+  "business": "Sunrise Tech Academy",
+  "note": "A fictional demo business. Replace these questions and answers with your own.",
+  "fallback": "I'm not sure about that one. I've passed your question to our team, and they'll reply on WhatsApp within a few hours. You can also call 0300-0000000 (demo number).",
+  "greeting": "Hi! I'm the Sunrise Tech Academy assistant. Ask me about courses, fees, timings or admissions.",
+  "faqs": [
+    {
+      "q": "What courses do you offer?",
+      "alt": [
+        "which courses are available",
+        "list of courses",
+        "what can I learn here",
+        "courses kya hain",
+        "kon se course hain"
+      ],
+      "a": "We offer 4 courses: Python for Beginners, Data Science with Python, Machine Learning, and Web Development (HTML, CSS, JavaScript)."
+    },
+    {
+      "q": "Do you teach other languages like Java or C++?",
+      "alt": [
+        "do you teach java",
+        "c++ course",
+        "javascript course",
+        "other programming languages",
+        "android app development",
+        "java sikhate ho"
+      ],
+      "a": "Right now we teach Python, Data Science, Machine Learning and Web Development (which includes JavaScript). Java and C++ aren't offered yet, but tell us if you're interested and we'll let you know when they start."
+    },
+    {
+      "q": "How much are the fees?",
+      "alt": [
+        "what is the fee",
+        "course price",
+        "how much does it cost",
+        "fees kitni hai",
+        "fee structure",
+        "cost of the course"
+      ],
+      "a": "Python for Beginners is Rs 15,000. Data Science and Web Development are Rs 25,000 each. Machine Learning is Rs 35,000. You can pay in 2 instalments."
+    },
+    {
+      "q": "Can I pay in instalments?",
+      "alt": [
+        "installment plan",
+        "pay monthly",
+        "can I pay later",
+        "qist",
+        "split the payment"
+      ],
+      "a": "Yes. You can pay 50% at admission and 50% after the first month."
+    },
+    {
+      "q": "Is there a discount?",
+      "alt": [
+        "any discount",
+        "student discount",
+        "sibling discount",
+        "offer",
+        "promo"
+      ],
+      "a": "Students get 10% off with a valid student card, and there's 15% off if two siblings or friends join together."
+    },
+    {
+      "q": "What are the class timings?",
+      "alt": [
+        "class time",
+        "when are classes",
+        "schedule",
+        "timing kya hai",
+        "what time do classes start",
+        "weekend classes"
+      ],
+      "a": "Weekday classes run 6 pm to 8 pm, Monday to Thursday. Weekend classes run 10 am to 2 pm on Saturdays."
+    },
+    {
+      "q": "How long is each course?",
+      "alt": [
+        "course duration",
+        "how many weeks",
+        "how many months",
+        "kitne mahine ka course",
+        "length of course"
+      ],
+      "a": "Python for Beginners is 6 weeks. Data Science and Web Development are 10 weeks. Machine Learning is 12 weeks."
+    },
+    {
+      "q": "Are classes online or on campus?",
+      "alt": [
+        "online classes",
+        "physical classes",
+        "can I study from home",
+        "remote",
+        "online hai ya physical"
+      ],
+      "a": "Both. You can join on campus or online live on Zoom. Recordings are shared after every class."
+    },
+    {
+      "q": "Where are you located?",
+      "alt": [
+        "address",
+        "location",
+        "where is the campus",
+        "how to reach you",
+        "office kahan hai"
+      ],
+      "a": "Our campus is at Blue Area, Islamabad (demo address). It's a 5-minute walk from the main metro bus stop."
+    },
+    {
+      "q": "How do I apply?",
+      "alt": [
+        "admission process",
+        "how to enroll",
+        "how can I register",
+        "sign up",
+        "admission kaise len",
+        "join the course"
+      ],
+      "a": "Fill in the online form on our website, pay the first instalment, and you'll get a confirmation email with your class link and timetable."
+    },
+    {
+      "q": "When does the next batch start?",
+      "alt": [
+        "next batch",
+        "start date",
+        "new session",
+        "when can I join",
+        "agla batch kab hai"
+      ],
+      "a": "New batches start on the 1st of every month. Admissions close 3 days before."
+    },
+    {
+      "q": "Do I need any experience?",
+      "alt": [
+        "is it for beginners",
+        "prerequisites",
+        "I am a beginner",
+        "no coding background",
+        "requirements"
+      ],
+      "a": "No experience is needed for Python for Beginners or Web Development. For Data Science and Machine Learning, you should know basic Python first."
+    },
+    {
+      "q": "Do I need my own laptop?",
+      "alt": [
+        "laptop required",
+        "computer needed",
+        "system requirements",
+        "can I use a phone"
+      ],
+      "a": "Yes, please bring a laptop with at least 8 GB RAM. All the software we use is free, and we'll help you install it in the first class."
+    },
+    {
+      "q": "Will I get a certificate?",
+      "alt": [
+        "certificate",
+        "is there a certificate",
+        "certification",
+        "certificate milega"
+      ],
+      "a": "Yes. You get a certificate when you complete the course and submit the final project."
+    },
+    {
+      "q": "Do you help with jobs or internships?",
+      "alt": [
+        "job placement",
+        "internship",
+        "career support",
+        "will I get a job",
+        "job milegi"
+      ],
+      "a": "We help with your CV, GitHub portfolio and interview practice, and we share internship openings from partner companies. We can't guarantee a job."
+    },
+    {
+      "q": "Can I get a refund?",
+      "alt": [
+        "refund policy",
+        "money back",
+        "cancel admission",
+        "paise wapis"
+      ],
+      "a": "You can get a full refund within 7 days of the batch starting. After that, the fee isn't refundable, but you can move to a later batch once."
+    },
+    {
+      "q": "Who are the teachers?",
+      "alt": [
+        "instructors",
+        "trainers",
+        "who teaches",
+        "teacher kaun hai",
+        "faculty"
+      ],
+      "a": "Our trainers are working data scientists and developers with industry and teaching experience."
+    },
+    {
+      "q": "What if I miss a class?",
+      "alt": [
+        "missed class",
+        "class recording",
+        "I was absent",
+        "makeup class"
+      ],
+      "a": "Every class is recorded. You can watch the recording and ask questions in the next class or in our student WhatsApp group."
+    },
+    {
+      "q": "Are there projects in the course?",
+      "alt": [
+        "practical work",
+        "real projects",
+        "hands on",
+        "assignments"
+      ],
+      "a": "Yes, every course is practical. You build a project every week and one final project for your portfolio."
+    },
+    {
+      "q": "Do you teach girls-only batches?",
+      "alt": [
+        "female batch",
+        "ladies batch",
+        "women only class",
+        "girls batch"
+      ],
+      "a": "Yes, we run a women-only weekend batch for every course."
+    },
+    {
+      "q": "How can I contact you?",
+      "alt": [
+        "phone number",
+        "whatsapp",
+        "email",
+        "talk to someone",
+        "contact number"
+      ],
+      "a": "WhatsApp us at 0300-0000000 or email hello@sunrise-demo.example (demo contact details)."
+    }
+  ],
+  "smalltalk": [
+    {
+      "q": "hi",
+      "alt": [
+        "hello",
+        "hey",
+        "salam",
+        "assalam o alaikum",
+        "good morning"
+      ],
+      "a": "Hi! How can I help you today? You can ask about courses, fees, timings or admissions."
+    },
+    {
+      "q": "thank you",
+      "alt": [
+        "thanks",
+        "shukriya",
+        "great thanks",
+        "ok thanks"
+      ],
+      "a": "You're welcome! Anything else I can help with?"
+    }
+  ]
+}
